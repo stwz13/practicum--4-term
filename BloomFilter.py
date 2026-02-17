@@ -28,3 +28,5 @@ class BloomFilter:
             if self.__bite_array[number] == 0:
                 return False
         return True
+
+
