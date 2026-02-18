@@ -20,7 +20,7 @@ class BloomFilter:
     def add_element(self, element: str):
         for number_of_hash_func in range(self._k):
             array_index = self._get_hash(element, number_of_hash_func) % self._m
-            self._counters[array_index] += 1
+            self._counters[array_index] = 1
 
 
     @staticmethod
@@ -34,7 +34,3 @@ class BloomFilter:
             if self._counters[number] == 0:
                 return False
         return True
-
-
-bf = BloomFilter(eps=0.01, n=15)
-bf.add_element("F")
