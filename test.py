@@ -1,11 +1,14 @@
 import string
 import random
 import pytest
-
 from bloom_counter_filter import BloomCounterFilter
 
 def generate_random_string(str_len: int):
-    return "".join(random.choices(string.ascii_letters, k=str_len))
+    return "".join(random.choices(string.ascii_letters + string.digits, k=str_len))
+
+@pytest.fixture()
+def create_small_filter():
+    return BloomCounterFilter(eps=0.1, n=15)
 
 def test_added_element_is_in_filter():
     bloom_counter_filter = BloomCounterFilter(eps=0.1, n=15)
