@@ -6,8 +6,12 @@ import bitarray
 class BloomFilter:
     def __init__(self, k: int, m: int,
                  hash_func: Callable[[str], int] = mmh3.hash128):
+        # if k is not int or m is not int:
+        #     raise ValueError("K and m must be type int")
+
         if k <= 0 or m <= 0:
             raise ValueError("K and m must be higher than 0")
+
         self._m = m
         self._k = k
 
@@ -17,12 +21,18 @@ class BloomFilter:
     @classmethod
     def make_filter_with_specified_accuracy(cls, eps: float, n: int,
                                             hash_func: Callable[[str], int] = mmh3.hash128):
-        k, m = cls._calculate_k_and_m__with_specified_accuracy(eps, n)
+        # if n is not int:
+        #     raise ValueError("n must be type int")
+        if n <= 0:
+            raise ValueError("Eps and n must be higher than 0")
+        if not 0 <= eps <= 1:
+            raise ValueError("Eps must be higher than 0 and less than 1")
+        k, m = cls.calculate_k_and_m__with_specified_accuracy(eps, n)
 
         return cls(k, m, hash_func)
 
     @staticmethod
-    def _calculate_k_and_m__with_specified_accuracy(eps: float, n: int,) -> Tuple[int, int]:
+    def calculate_k_and_m__with_specified_accuracy(eps: float, n: int, ) -> Tuple[int, int]:
         m = int(np.ceil(-n * np.log(eps) / (np.log(2) ** 2)))
         k = int(np.ceil(m * np.log(2) / n))
         return k, m
