@@ -1,4 +1,3 @@
-from sqlalchemy.util import counter
 from bloom_filter import BloomFilter
 from typing import Callable
 import mmh3
@@ -18,6 +17,7 @@ class BloomCounterFilter(BloomFilter):
     def remove_element(self, element: str) -> None:
         if not self.element_is_in_filter(element):
             raise ValueError("Element not in the filter")
+
         for number_of_hush_function in range(self._k):
             count_number = self._get_hash(element, number_of_hush_function) % self._m
             self._counters[count_number] -= 1
