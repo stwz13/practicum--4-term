@@ -1,14 +1,14 @@
+from __future__ import annotations
+
 from typing import Callable, Tuple
 import mmh3
 import numpy as np
 import bitarray
 
+
 class BloomFilter:
     def __init__(self, k: int, m: int,
                  hash_func: Callable[[str], int] = mmh3.hash128):
-        # if k is not int or m is not int:
-        #     raise ValueError("K and m must be type int")
-
         if k <= 0 or m <= 0:
             raise ValueError("K and m must be higher than 0")
 
@@ -62,3 +62,28 @@ class BloomFilter:
             if self._counters[number] == 0:
                 return False
         return True
+
+    @staticmethod
+    def union_filters(bf1, bf2):
+        if bf1.m != bf2.m:
+            raise ValueError("Filters must have same m")
+
+        union_filter = BloomFilter(bf1.k, bf1.m)
+        union_filter._counters = [bf1._counters[i] or bf2._counters[i]
+                                  for i in range(bf1.m)]
+
+        return union_filter
+
+    @staticmethod
+    def intersect_filters(bf1, bf2):
+        if bf1.m != bf2.m:
+            raise ValueError("Filters must have same m")
+
+        intersect_filter = BloomFilter(bf1.k, bf1.m)
+        intersect_filter._counters = [bf1._counters[i] and bf2._counters[i]
+                                  for i in range(bf1.m)]
+
+        return intersect_filter
+
+
+
