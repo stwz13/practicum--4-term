@@ -92,7 +92,7 @@ def test_union_with_different_m():
     bf2 = BloomCounterFilter(k=5, m=5)
 
     with pytest.raises(ValueError):
-        BloomCounterFilter.union_filters(bf1, bf2)
+        bf1 + bf2
 
 
 def test_union_with_same_m():
@@ -107,7 +107,7 @@ def test_union_with_same_m():
     bf1.add_element("D")
     bf2.add_element("E")
 
-    union_filter = BloomCounterFilter.union_filters(bf1, bf2)
+    union_filter = bf1 + bf2
 
     for element in common_elements_to_adding:
         assert union_filter.element_is_in_filter(element)

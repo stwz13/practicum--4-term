@@ -21,8 +21,6 @@ class BloomFilter:
     @classmethod
     def make_filter_with_specified_accuracy(cls, eps: float, n: int,
                                             hash_func: Callable[[str], int] = mmh3.hash128):
-        # if n is not int:
-        #     raise ValueError("n must be type int")
         if n <= 0:
             raise ValueError("Eps and n must be higher than 0")
         if not 0 <= eps <= 1:
@@ -63,14 +61,13 @@ class BloomFilter:
                 return False
         return True
 
-    @staticmethod
-    def union_filters(bf1, bf2):
-        if bf1.m != bf2.m:
+    def __add__(self, other):
+        if self.m != other.m:
             raise ValueError("Filters must have same m")
 
-        union_filter = BloomFilter(bf1.k, bf1.m)
-        union_filter._counters = [bf1._counters[i] or bf2._counters[i]
-                                  for i in range(bf1.m)]
+        union_filter = BloomFilter(self.k, self.m)
+        union_filter._counters = [self._counters[i] or other._counters[i]
+                                  for i in range(self.m)]
 
         return union_filter
 
