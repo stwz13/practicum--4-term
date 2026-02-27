@@ -35,6 +35,16 @@ class BloomFilter:
         k = int(np.ceil(m * np.log(2) / n))
         return k, m
 
+    def remove_element(self, element: str) -> None:
+        if not self.element_is_in_filter(element):
+            raise ValueError("Element not in the filter")
+
+        for number_of_hush_function in range(self._k):
+            count_number = self._get_hash(element, number_of_hush_function) % self._m
+            self._counters[count_number] = 0
+
+
+
     @property
     def m(self) -> int:
         return self._m
