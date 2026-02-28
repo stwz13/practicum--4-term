@@ -129,8 +129,7 @@ def test_try_to_remove_element_that_is_not_in_counting_filter():
 
 def test_adding_and_removing_in_counting_filter():
     bloom_counter_filter = BloomCounterFilter.make_filter_with_specified_accuracy(eps=0.5, n=15)
-
-    elements_to_adding = [next(infinite_str_stream_generation()) for _ in range(n)]
+    elements_to_adding = [next(infinite_str_stream_generation()) for _ in range(3)]
 
     for element in elements_to_adding:
         bloom_counter_filter.add_element(element)
@@ -139,7 +138,7 @@ def test_adding_and_removing_in_counting_filter():
 
     assert bloom_counter_filter.element_is_in_filter(elements_to_adding[0])
     assert bloom_counter_filter.element_is_in_filter(elements_to_adding[1])
-    assert not bloom_counter_filter.element_is_in_filter(elements_to_adding[2])
+    assert not bloom_counter_filter.element_is_in_filter(elements_to_adding[-1])
 
 def test_union_counting_filters_with_different_m():
     bf1 = BloomCounterFilter(k=5, m=15)
@@ -149,7 +148,7 @@ def test_union_counting_filters_with_different_m():
         bf1 + bf2
 
 
-def test_union_couting_filters_with_same_m():
+def test_union_counting_filters_with_same_m():
     bf1 = BloomCounterFilter(k=5, m=25)
     bf2 = BloomCounterFilter(k=5, m=25)
 
@@ -162,7 +161,7 @@ def test_union_couting_filters_with_same_m():
     element_to_second_filter = next(infinite_str_stream_generation())
 
     bf1.add_element(element_to_first_filter)
-    bf2.add_element(element_to_first_filter)
+    bf2.add_element(element_to_second_filter)
 
     union_filter = bf1 + bf2
 
@@ -174,8 +173,8 @@ def test_union_couting_filters_with_same_m():
 
 
 def test_intersect_counting_filters_with_different_m():
-    bf1 = BloomCounterFilter.make_filter_with_specified_accuracy(n=15, eps=0.01)
-    bf2 = BloomCounterFilter.make_filter_with_specified_accuracy(n=15, eps=0.01)
+    bf1 = BloomCounterFilter(k=15, m=10)
+    bf2 = BloomCounterFilter(k=15, m=15)
 
     with pytest.raises(ValueError):
         BloomCounterFilter.intersect_filters(bf1, bf2)

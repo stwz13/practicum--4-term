@@ -1,6 +1,6 @@
 from hashlib import md5
 import numpy as np
-
+from infinite_str_stream_generation import infinite_str_stream_generation
 
 
 class HyperLogLog:
@@ -25,24 +25,22 @@ class HyperLogLog:
 
     def add_element(self, element: str) -> None:
         byte_str = element.encode("utf-8")
-        x = int(md5(byte_str).hexdigest(), 16) & ((1 << self._q) - 1)
+        x = int(md5(byte_str).hexdigest(), 16)
 
-        b = self._q
-        j = (x >> (self._q - b)) + 1
-        w = x & ((1 << (self._q - b)) - 1)
+        j = (x >> (self._q - self._p)) & ((1 << self._p) - 1)
+        w = x & ((1 << (self._q - self._p)) - 1)
 
         if w == 0:
-            p_w = self._q - b + 1
+            p_w = self._q - self._p + 1
         else:
-            leading_zeros = (self._q - b) - w.bit_length()
-            p_w = leading_zeros + 1
+            p_w = (self._q - self._p) - w.bit_length() + 1
         self._registers[j] = max(self._registers[j], p_w)
 
     def get_top_score_of_cardinality(self) -> int:
         count_of_zero_registers = 0
         z = 0
         for reg in self._registers:
-            if reg == 0:
+            if reg == 0:я
                 count_of_zero_registers += 1
             z += 2 ** (-reg)
 
@@ -51,7 +49,7 @@ class HyperLogLog:
         if count_of_zero_registers > 0 and score < 5/2 * self._m:
             return int(self._m * np.log(self._m / count_of_zero_registers))
 
-        if score > 2** self._q / 30:
+        if score > 2 ** self._q / 30:
             return int(-2**32 * np.log(1 - score/2**32))
 
         return int(score)
@@ -75,3 +73,13 @@ class HyperLogLog:
         for i in range(self._m):
             union_hpp._registers[i] = max(self._registers[i], other._registers[i])
         return union_hpp
+
+
+hll = HyperLogLog.make_hpp_with_specified_accuracy(n=50, eps=0.05)
+
+elements = [next(infinite_str_stream_generation()) for _ in range(25)]
+
+for element in elements:
+    hll.add_element(element)
+
+hll.get_top_score_of_cardinality()
