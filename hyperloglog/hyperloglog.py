@@ -25,25 +25,32 @@ class HyperLogLog:
 
     def add_element(self, element: str) -> None:
         byte_str = element.encode("utf-8")
-        x = int(md5(byte_str).hexdigest(), 16)
+        hash_value = int(md5(byte_str).hexdigest(), 16)
+        binary_hash = bin(hash_value)[2:].zfill(self._q)
 
-        j = (x >> (self._q - self._p)) & ((1 << self._p) - 1)
-        w = x & ((1 << (self._q - self._p)) - 1)
+        number_of_register = int(binary_hash[:self._p], 2)
 
-        if w == 0:
-            p_w = self._q - self._p + 1
+        binary_hash_without_number_of_register = binary_hash[:self._p]
+        first_one_position = binary_hash_without_number_of_register.find("-1")
+
+        if first_one_position != -1:
+            count_of_main_zeros = first_one_position + 1
         else:
-            p_w = (self._q - self._p) - w.bit_length() + 1
-        self._registers[j] = max(self._registers[j], p_w)
+            count_of_main_zeros = len(binary_hash_without_number_of_register)
+
+        self._registers[number_of_register] = max(self._registers[number_of_register], count_of_main_zeros)
+
 
     def get_top_score_of_cardinality(self) -> int:
         count_of_zero_registers = 0
         z = 0
+
         for reg in self._registers:
-            if reg == 0:я
+            if reg == 0:
                 count_of_zero_registers += 1
             z += 2 ** (-reg)
 
+        z = z ** (-1)
         score = self._get_alfa() * self._m ** 2 * z
 
         if count_of_zero_registers > 0 and score < 5/2 * self._m:
@@ -73,13 +80,3 @@ class HyperLogLog:
         for i in range(self._m):
             union_hpp._registers[i] = max(self._registers[i], other._registers[i])
         return union_hpp
-
-
-hll = HyperLogLog.make_hpp_with_specified_accuracy(n=50, eps=0.05)
-
-elements = [next(infinite_str_stream_generation()) for _ in range(25)]
-
-for element in elements:
-    hll.add_element(element)
-
-hll.get_top_score_of_cardinality()
