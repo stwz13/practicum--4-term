@@ -4,44 +4,48 @@ from infinite_str_stream_generation import infinite_str_stream_generation
 
 
 class HyperLogLog:
-    def __init__(self, n: int, p: int, q: int = 32):
-        if n <= 0 or p <= 0:
-            raise ValueError("N and p must be positive")
+    def __init__(self, p: int, q: int = 32):
+        if p <= 0:
+            raise ValueError("p must be positive")
 
-        self._n = n # максимальный размер множества
         self._p = p # количество бит, определяющих разбиение на подмножества
         self._m = 2 ** p# количество счетчиков
         self._q = q# размер счетчиков
         self._registers = [0] * self._m
 
+    @property
+    def m(self) -> int:
+        return self._m
+
+    @property
+    def p(self) -> int:
+        return self._p
+
     @classmethod
-    def make_hpp_with_specified_accuracy(cls, n: int, eps: float):
-        if not 0 <= eps <= 100:
-            raise ValueError("Eps must be less than 100 and higher than 0")
-        eps = eps / 100
+    def make_hpp_with_specified_accuracy(cls, eps: float):
+        if not 0 <= eps <= 1:
+            raise ValueError("Eps must be less than 1 and higher than 0")
+
         p = int(np.ceil(2*np.log2(1.04 / eps)))
 
-        return cls(n, p)
+        return cls(p)
 
-    def add_element(self, element: str) -> None:
-        byte_str = element.encode("utf-8")
-        hash_value = int(md5(byte_str).hexdigest(), 16)
-        binary_hash = bin(hash_value)[2:].zfill(self._q)
+    def add(self, element: str) -> None:
+        h = int.from_bytes(md5(element.encode('utf-8')).digest(), 'big')
+        bucket = h >> (128 - self._p)
 
-        number_of_register = int(binary_hash[:self._p], 2)
+        remaining_bits = min(self._q, 128 - self._p)
+        w = h & ((1 << remaining_bits) - 1)
 
-        binary_hash_without_number_of_register = binary_hash[:self._p]
-        first_one_position = binary_hash_without_number_of_register.find("-1")
-
-        if first_one_position != -1:
-            count_of_main_zeros = first_one_position + 1
+        if w == 0:
+            count_of_main_zeros = remaining_bits + 1
         else:
-            count_of_main_zeros = len(binary_hash_without_number_of_register)
+            count_of_main_zeros = remaining_bits - w.bit_length() + 1
 
-        self._registers[number_of_register] = max(self._registers[number_of_register], count_of_main_zeros)
+        self._registers[bucket] = max(self._registers[bucket], count_of_main_zeros)
 
 
-    def get_top_score_of_cardinality(self) -> int:
+    def cardinality(self):
         count_of_zero_registers = 0
         z = 0
 
@@ -76,7 +80,7 @@ class HyperLogLog:
         if self._p != other._p or self._q != other._q:
             raise ValueError("P and q must have same values")
 
-        union_hpp = HyperLogLog(self._n, self._p, self._q)
+        union_hpp = HyperLogLog(self._p, self._q)
         for i in range(self._m):
             union_hpp._registers[i] = max(self._registers[i], other._registers[i])
         return union_hpp

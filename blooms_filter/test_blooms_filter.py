@@ -37,7 +37,7 @@ def test_remove_element():
     bloom_filter = BloomFilter.make_filter_with_specified_accuracy(n=5, eps=0.01)
 
     element = next(infinite_str_stream_generation())
-    bloom_filter.add_element(element)
+    bloom_filter.add(element)
     bloom_filter.remove_element(element)
 
     assert not bloom_filter.element_is_in_filter(element)
@@ -56,7 +56,7 @@ def test_add_many_elements():
     elements_to_adding = [next(infinite_str_stream_generation()) for _ in range(n)]
 
     for element in elements_to_adding:
-        bloom_filter.add_element(element)
+        bloom_filter.add(element)
 
     for element in elements_to_adding:
         assert bloom_filter.element_is_in_filter(element)
@@ -64,7 +64,7 @@ def test_add_many_elements():
 def test_added_element_is_in_counting_filter():
     bloom_counter_filter = BloomCounterFilter.make_filter_with_specified_accuracy(eps=0.1, n=15)
     element = next(infinite_str_stream_generation())
-    bloom_counter_filter.add_element(element)
+    bloom_counter_filter.add(element)
 
     assert bloom_counter_filter.element_is_in_filter(element)
 
@@ -78,7 +78,7 @@ def test_delete_element_from_counting_filter():
     bloom_counter_filter = BloomCounterFilter.make_filter_with_specified_accuracy(eps=0.1, n=15)
 
     element = next(infinite_str_stream_generation())
-    bloom_counter_filter.add_element(element)
+    bloom_counter_filter.add(element)
     bloom_counter_filter.remove_element(element)
 
     assert not bloom_counter_filter.element_is_in_filter(element)
@@ -89,8 +89,8 @@ def test_old_element_is_in_counting_filter_after_delete_another_element():
     element1 = next(infinite_str_stream_generation())
     element2 = next(infinite_str_stream_generation())
 
-    bloom_counter_filter.add_element(element1)
-    bloom_counter_filter.add_element(element2)
+    bloom_counter_filter.add(element1)
+    bloom_counter_filter.add(element2)
 
     bloom_counter_filter.remove_element(element1)
 
@@ -102,7 +102,7 @@ def test_add_several_elements_in_counting_filter():
     bloom_counter_filter = BloomCounterFilter.make_filter_with_specified_accuracy(eps=0.5, n=n)
     elements_to_add = [next(infinite_str_stream_generation()) for _ in range(n)]
     for element in elements_to_add:
-        bloom_counter_filter.add_element(element)
+        bloom_counter_filter.add(element)
 
     for element in elements_to_add:
         assert bloom_counter_filter.element_is_in_filter(element)
@@ -132,7 +132,7 @@ def test_adding_and_removing_in_counting_filter():
     elements_to_adding = [next(infinite_str_stream_generation()) for _ in range(3)]
 
     for element in elements_to_adding:
-        bloom_counter_filter.add_element(element)
+        bloom_counter_filter.add(element)
 
     bloom_counter_filter.remove_element(elements_to_adding[-1])
 
@@ -186,8 +186,8 @@ def test_intersect_counting_filters_with_same_m():
 
     common_elements_to_adding = [next(infinite_str_stream_generation()) for _ in range(3)]
     for element in common_elements_to_adding:
-        bf1.add_element(element)
-        bf2.add_element(element)
+        bf1.add(element)
+        bf2.add(element)
 
     element_to_first_filter = next(infinite_str_stream_generation())
     element_to_second_filter = next(infinite_str_stream_generation())
