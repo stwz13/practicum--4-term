@@ -31,7 +31,7 @@ class HyperLogLog:
         return cls(p)
 
     def add(self, element: str) -> None:
-        h = int.from_bytes(md5(element.encode('utf-8')).digest(), 'big')
+        h = int.from_bytes(md5(element.encode('utf-8')).digest(), byteorder='big')
         bucket = h >> (128 - self._p)
 
         remaining_bits = min(self._q, 128 - self._p)
