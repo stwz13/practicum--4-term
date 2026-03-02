@@ -22,7 +22,7 @@ class BloomFilter:
     def make_filter_with_specified_accuracy(cls, eps: float, n: int,
                                             hash_func: Callable[[str], int] = mmh3.hash128):
         if n <= 0:
-            raise ValueError("Eps and n must be higher than 0")
+            raise ValueError("n must be higher than 0")
         if not 0 <= eps <= 1:
             raise ValueError("Eps must be higher than 0 and less than 1")
         k, m = cls.calculate_k_and_m__with_specified_accuracy(eps, n)

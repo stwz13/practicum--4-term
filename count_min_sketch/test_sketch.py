@@ -52,6 +52,7 @@ def test_adding_popular_element():
     sketch = CountMinSketch.make_sketch_with_accuracy(eps=0.01, delta=0.1)
     popular_element = next(infinite_str_stream_generation())
 
+    set_of_elements = set()
     for _ in range(500):
         sketch.add(next(infinite_str_stream_generation()))
 

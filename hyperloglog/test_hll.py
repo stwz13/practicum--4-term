@@ -1,6 +1,6 @@
 import pytest
 from hyperloglog import HyperLogLog
-from infinite_str_stream_generation import infinite_str_stream_generation
+from infinite_str_stream_generation import infinite_str_stream_generation, get_set_of_unique_elements
 
 def test_uncorrected_p():
     with pytest.raises(ValueError):
@@ -17,7 +17,7 @@ def test_adding_elements_to_hll():
 
     hll = HyperLogLog(p=8)
 
-    elements = [next(infinite_str_stream_generation()) for _ in range(count_of_elements)]
+    elements = get_set_of_unique_elements(count_of_elements)
 
     for element in elements:
         hll.add(element)
@@ -29,7 +29,7 @@ def test_adding_same_elements():
     accuracy = 0.1
     hll = HyperLogLog.make_hpp_with_specified_accuracy(eps=accuracy)
 
-    elements = [next(infinite_str_stream_generation()) for _ in range(count_of_elements)]
+    elements = get_set_of_unique_elements(count_of_elements)
     for element in elements:
         hll.add(element)
         hll.add(element)
@@ -41,7 +41,7 @@ def test_adding_small_stream_to_hll():
     accuracy = 0.1
     hll = HyperLogLog(p=8)
 
-    elements = [next(infinite_str_stream_generation()) for _ in range(count_of_elements)]
+    elements = get_set_of_unique_elements(count_of_elements)
 
     for element in elements:
         hll.add(element)
@@ -53,7 +53,7 @@ def test_adding_normal_stream_to_hll():
     accuracy = 0.1
     hll = HyperLogLog.make_hpp_with_specified_accuracy(eps=accuracy)
 
-    elements = [next(infinite_str_stream_generation()) for _ in range(count_of_elements)]
+    elements = get_set_of_unique_elements(count_of_elements)
 
     for element in elements:
         hll.add(element)
@@ -65,7 +65,7 @@ def test_adding_big_stream_to_hll():
 
     hll = HyperLogLog.make_hpp_with_specified_accuracy(eps=0.01)
 
-    elements = [next(infinite_str_stream_generation()) for _ in range(count_of_elements)]
+    elements = get_set_of_unique_elements(count_of_elements)
 
     for element in elements:
         hll.add(element)
@@ -86,8 +86,8 @@ def test_union_of_small_and_normal_streams():
     hll1 = HyperLogLog(p=16)
     hll2 = HyperLogLog(p=16)
 
-    elements1 = [next(infinite_str_stream_generation()) for _ in range(len1)]
-    elements2 = [next(infinite_str_stream_generation()) for _ in range(len2)]
+    elements1 = get_set_of_unique_elements(len1)
+    elements2 = get_set_of_unique_elements(len2)
 
     common_len = len(set(elements1)) + len(set(elements2))
 

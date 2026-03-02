@@ -5,8 +5,8 @@ from infinite_str_stream_generation import infinite_str_stream_generation
 
 class HyperLogLog:
     def __init__(self, p: int, q: int = 32):
-        if p <= 0:
-            raise ValueError("p must be positive")
+        if p <= 0 or q <= 0:
+            raise ValueError("p and q must be positive")
 
         self._p = p # количество бит, определяющих разбиение на подмножества
         self._m = 2 ** p# количество счетчиков
