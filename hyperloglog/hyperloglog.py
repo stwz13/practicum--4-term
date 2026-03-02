@@ -46,7 +46,7 @@ class HyperLogLog:
         else:
             count_of_main_zeros = first_one_pos
 
-        self._registers[bucket] = max(self._registers[bucket], count_of_main_zeros + 1)
+        self._registers[bucket] = max(self._registers[bucket], count_of_main_zeros+1)
 
 
     def cardinality(self):
