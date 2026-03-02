@@ -31,18 +31,22 @@ class HyperLogLog:
         return cls(p)
 
     def add(self, element: str) -> None:
-        h = int.from_bytes(md5(element.encode('utf-8')).digest(), byteorder='big')
-        bucket = h >> (128 - self._p)
+        hash_value = md5(element.encode('utf-8')).digest()
 
-        remaining_bits = min(self._q, 128 - self._p)
-        w = h & ((1 << remaining_bits) - 1)
+        binary = bin(int.from_bytes(hash_value, byteorder='big'))[2:].zfill(128)
+        bucket_bits = binary[:self._p]
+        bucket = int(bucket_bits, 2)
 
-        if w == 0:
-            count_of_main_zeros = remaining_bits + 1
+        remaining_bits_count = min(self._q, 128 - self._p)
+        remaining_bits = binary[self._p:self._p + remaining_bits_count]
+
+        first_one_pos = remaining_bits.find('1')
+        if first_one_pos == -1:
+            count_of_main_zeros = len(remaining_bits)
         else:
-            count_of_main_zeros = remaining_bits - w.bit_length() + 1
+            count_of_main_zeros = first_one_pos
 
-        self._registers[bucket] = max(self._registers[bucket], count_of_main_zeros)
+        self._registers[bucket] = max(self._registers[bucket], count_of_main_zeros + 1)
 
 
     def cardinality(self):
