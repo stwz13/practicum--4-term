@@ -8,9 +8,9 @@ class HyperLogLog:
         if p <= 0 or q <= 0:
             raise ValueError("p and q must be positive")
 
-        self._p = p # количество бит, определяющих разбиение на подмножества
-        self._m = 2 ** p# количество счетчиков
-        self._q = q# размер счетчиков
+        self._p = p
+        self._m = 2 ** p
+        self._q = q
         self._registers = [0] * self._m
 
     @property
